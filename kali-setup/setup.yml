@@ -47,6 +47,12 @@
       apt:
         name: tmux
         state: present
+        
+    - name: Install xsel for tmux-yank support
+      become: true
+      apt:
+        name: xsel
+        state: present
 
     - name: Copy tmux config file
       copy:
