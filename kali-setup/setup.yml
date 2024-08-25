@@ -1,0 +1,62 @@
+---                                                                                                                                                                                                                                                  [0/179]
+- hosts: localhost
+  tasks:
+    - name: Set PS1 for current user
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        regexp: '^export PS1='
+        line: 'export PS1="\[$(tput setaf 34)\]\[$(tput bold)\]🐧 \t \[$(tput setaf 240)\]\w\[$(tput sgr0)\] $ "'
+        create: yes
+
+    - name: Set PS1 for root user
+      become: true
+      lineinfile:
+        path: "/root/.bashrc"
+        regexp: '^export PS1='
+        line: 'export PS1="\[$(tput setaf 1)\]\[$(tput bold)\]🐧 \t \[$(tput setaf 240)\]\w\[$(tput sgr0)\] $ "'
+        create: yes
+
+    - name: Set PROMPT_COMMAND for current user
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        regexp: '^export PROMPT_COMMAND='
+        line: 'export PROMPT_COMMAND=""'
+        create: yes
+
+    - name: Set PROMPT_COMMAND for root user
+      become: true
+      lineinfile:
+        path: "/root/.bashrc"
+        regexp: '^export PROMPT_COMMAND='
+        line: 'export PROMPT_COMMAND=""'
+        create: yes
+
+    - name: Change shell for current user to bash
+      user:
+        name: "{{ ansible_env.USER }}"
+        shell: /bin/bash
+
+    - name: Change shell for root to bash
+      become: true
+      user:
+        name: root
+        shell: /bin/bash
+
+    - name: Install tmux
+      become: true
+      apt:
+        name: tmux
+        state: present
+
+    - name: Copy tmux config file
+      copy:
+        src: ./tmux.conf
+        dest: "{{ ansible_env.HOME }}/.tmux.conf"
+        owner: "{{ ansible_env.USER }}"
+        mode: '0644'
+
+    - name: Clone TPM (Tmux Plugin Manager) repository
+      git:
+        repo: 'https://github.com/tmux-plugins/tpm'
+        dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+        version: master
