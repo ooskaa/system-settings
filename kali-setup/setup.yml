@@ -42,17 +42,16 @@
         name: root
         shell: /bin/bash
 
-    - name: Install tmux
+    - name: Install packages
       become: true
       apt:
-        name: tmux
-        state: present
-        
-    - name: Install xsel for tmux-yank support
-      become: true
-      apt:
-        name: xsel
-        state: present
+        pkg:
+          - tmux
+          - xsel
+          - gobuster
+          - seclist 
+        state: latest
+        update_cache: true
 
     - name: Copy tmux config file
       copy:
